@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Trailhead (a made-up demo app)</title>
+<!-- Trailhead is not a real app. These four screens exist only so introflow's public pictures and examples
+     show no real project. Open with #1 … #4 at 800 x 1280 and take a picture of each. Every name, place and
+     number here is invented. -->
+<style>
+@font-face { font-family: "PJS"; src: url("../fonts/PlusJakartaSans-Regular.ttf"); font-weight: 400; }
+@font-face { font-family: "PJS"; src: url("../fonts/PlusJakartaSans-SemiBold.ttf"); font-weight: 600; }
+@font-face { font-family: "PJS"; src: url("../fonts/PlusJakartaSans-Bold.ttf"); font-weight: 700; }
+@font-face { font-family: "PJS"; src: url("../fonts/PlusJakartaSans-ExtraBold.ttf"); font-weight: 800; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root { --bg: #0c1613; --card: #13211c; --line: #223630; --ink: #eef3f0; --soft: #9fb1a9; --acc: #f2a33a; --ok: #58c08c; }
+body { width: 800px; height: 1280px; overflow: hidden; background: var(--bg); color: var(--ink); font-family: "PJS", sans-serif; }
+.screen { display: none; width: 800px; height: 1280px; padding: 36px 40px 0; position: relative; }
+.screen.on { display: block; }
+.bar { display: flex; justify-content: space-between; align-items: center; font-size: 15px; color: var(--soft); font-weight: 600; }
+.bar b { color: var(--ink); font-weight: 800; font-size: 19px; letter-spacing: -.01em; }
+.eyebrow { margin-top: 44px; font-size: 14px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--acc); }
+h1 { font-size: 50px; font-weight: 800; letter-spacing: -.03em; margin-top: 8px; }
+.lede { font-size: 19px; color: var(--soft); margin-top: 8px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 22px; }
+.chip { display: inline-block; font-size: 13.5px; font-weight: 700; padding: 5px 13px; border-radius: 999px; background: rgba(242, 163, 58, .14); color: var(--acc); }
+.chip.ok { background: rgba(88, 192, 140, .14); color: var(--ok); }
+.btn { background: var(--acc); color: #1a1204; font-weight: 800; font-size: 18px; border-radius: 16px; padding: 17px 26px; display: inline-block; }
+.nav { position: absolute; left: 40px; right: 40px; bottom: 34px; display: grid; grid-template-columns: repeat(4, 1fr); background: var(--card); border: 1px solid var(--line); border-radius: 24px; padding: 8px; }
+.nav span { text-align: center; padding: 15px 0; border-radius: 17px; font-size: 16px; font-weight: 700; color: var(--soft); }
+.nav span.on { background: var(--acc); color: #1a1204; }
+/* 1 routes */
+.route { display: grid; grid-template-columns: 96px 1fr auto; gap: 20px; align-items: center; padding: 18px 22px 18px 18px; margin-top: 16px; }
+.route svg { width: 96px; height: 96px; border-radius: 16px; background: #0f1c18; }
+.route h3 { font-size: 23px; font-weight: 700; }
+.route p { font-size: 16px; color: var(--soft); margin-top: 5px; }
+.route .km { text-align: right; font-size: 28px; font-weight: 800; }
+.route .km small { display: block; font-size: 14px; color: var(--soft); font-weight: 600; }
+/* 2 map */
+.map { margin-top: 26px; height: 690px; overflow: hidden; position: relative; }
+.map svg { width: 100%; height: 100%; display: block; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 16px; }
+.stat { padding: 18px 22px; }
+.stat small { font-size: 14px; color: var(--soft); font-weight: 600; }
+.stat strong { display: block; font-size: 34px; font-weight: 800; letter-spacing: -.02em; margin-top: 2px; }
+.stat strong i { font-style: normal; font-size: 17px; color: var(--soft); font-weight: 600; }
+/* 3 plan */
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 26px; }
+.box { padding: 24px 26px; }
+.box h2 { font-size: 21px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
+.who { display: flex; align-items: center; gap: 14px; margin-top: 18px; font-size: 18px; font-weight: 600; }
+.who i { width: 42px; height: 42px; border-radius: 50%; background: #1f3830; color: var(--acc); display: grid; place-items: center; font-style: normal; font-weight: 800; font-size: 16px; }
+.who span { margin-left: auto; font-size: 14px; color: var(--soft); }
+.check { display: flex; align-items: center; gap: 14px; margin-top: 18px; font-size: 18px; font-weight: 600; }
+.check i { width: 28px; height: 28px; border-radius: 9px; border: 2px solid #37534a; display: grid; place-items: center; font-style: normal; font-size: 16px; color: #1a1204; flex: none; }
+.check.done i { background: var(--ok); border-color: var(--ok); }
+.check.done { color: var(--soft); }
+.meet { margin-top: 16px; padding: 24px 26px; display: flex; justify-content: space-between; align-items: center; }
+.meet h2 { font-size: 21px; font-weight: 700; }
+.meet p { color: var(--soft); font-size: 17px; margin-top: 5px; }
+/* 4 log */
+.profile { margin-top: 16px; padding: 24px 26px 18px; }
+.profile h2, .notes h2 { font-size: 21px; font-weight: 700; }
+.profile svg { width: 100%; height: 250px; margin-top: 14px; display: block; }
+.notes { margin-top: 16px; padding: 24px 26px; }
+.notes p { font-size: 18px; line-height: 1.6; color: var(--soft); margin-top: 10px; }
+.notes p b { color: var(--ink); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<section class="screen" id="s1">
+  <div class="bar"><b>Trailhead</b><span>Hillside Walking Club</span></div>
+  <div class="eyebrow">This season</div>
+  <h1>Routes</h1>
+  <p class="lede">Five walks saved on this tablet. All maps work without signal.</p>
+  <div class="card route"><svg viewBox="0 0 96 96" fill="none" stroke="#f2a33a" stroke-width="3" stroke-linecap="round"><path d="M14 74c10-22 18-6 28-26s20-8 36-28"/></svg><div><h3>Ridge Loop</h3><p>Pine Gap car park · 4 h 30</p><p style="margin-top:9px"><span class="chip">Moderate</span> <span class="chip ok">Planned · Sat 14 Nov</span></p></div><div class="km">12.4<small>km</small></div></div>
+  <div class="card route"><svg viewBox="0 0 96 96" fill="none" stroke="#58c08c" stroke-width="3" stroke-linecap="round"><path d="M12 60c14 4 16-22 30-18s14 22 40 4"/></svg><div><h3>Lake Shore Path</h3><p>North jetty · 2 h 10</p><p style="margin-top:9px"><span class="chip ok">Easy</span></p></div><div class="km">7.8<small>km</small></div></div>
+  <div class="card route"><svg viewBox="0 0 96 96" fill="none" stroke="#f2a33a" stroke-width="3" stroke-linecap="round"><path d="M12 80l16-30 12 12 14-34 12 20 16-28"/></svg><div><h3>Three Summits</h3><p>Stone bridge · 7 h 00</p><p style="margin-top:9px"><span class="chip">Hard</span></p></div><div class="km">19.2<small>km</small></div></div>
+  <div class="card route"><svg viewBox="0 0 96 96" fill="none" stroke="#58c08c" stroke-width="3" stroke-linecap="round"><path d="M14 30c20 0 10 26 30 26s14-24 38-18"/></svg><div><h3>Old Mill Valley</h3><p>Mill gate · 3 h 00</p><p style="margin-top:9px"><span class="chip ok">Easy</span></p></div><div class="km">9.5<small>km</small></div></div>
+  <div class="card route"><svg viewBox="0 0 96 96" fill="none" stroke="#f2a33a" stroke-width="3" stroke-linecap="round"><path d="M12 70c12-30 22-30 34-10s20 6 36-36"/></svg><div><h3>Heather Moor</h3><p>East stile · 5 h 15</p><p style="margin-top:9px"><span class="chip">Moderate</span></p></div><div class="km">14.0<small>km</small></div></div>
+  <div class="nav"><span class="on">Routes</span><span>Map</span><span>Plan</span><span>Log</span></div>
+</section>
+
+<section class="screen" id="s2">
+  <div class="bar"><b>Trailhead</b><span>Ridge Loop · offline map</span></div>
+  <div class="card map">
+    <svg viewBox="0 0 720 690" fill="none">
+      <rect width="720" height="690" fill="#0f1c18"/>
+      <g stroke="#1f352e" stroke-width="2">
+        <path d="M-20 560c120-80 210-20 320-90s190-150 440-130"/><path d="M-20 480c130-90 220-30 330-100s180-150 430-140"/>
+        <path d="M-20 400c140-100 230-40 340-110s170-150 420-150"/><path d="M-20 320c150-110 240-50 350-120s160-140 410-150"/>
+        <path d="M-20 240c160-110 250-60 360-120s150-120 400-140"/><path d="M-20 160c170-100 260-60 370-110s140-90 390-110"/>
+        <path d="M-20 640c110-70 200-10 310-80s200-150 450-120"/><path d="M-20 90c180-80 270-50 380-90s130-60 380-70"/>
+        <ellipse cx="470" cy="250" rx="150" ry="96"/><ellipse cx="470" cy="250" rx="104" ry="64"/><ellipse cx="470" cy="250" rx="58" ry="34"/>
+        <ellipse cx="210" cy="420" rx="110" ry="70"/><ellipse cx="210" cy="420" rx="62" ry="38"/>
+      </g>
+      <path d="M96 600c40-90 70-150 120-180s60-110 130-150 100-10 140 20 80 90 20 150-150 60-220 110-150 70-190 50z" stroke="#f2a33a" stroke-width="6" stroke-linejoin="round" stroke-dasharray="1 0"/>
+      <circle cx="96" cy="600" r="13" fill="#f2a33a" stroke="#0f1c18" stroke-width="4"/>
+      <circle cx="470" cy="250" r="9" fill="#eef3f0"/><circle cx="216" cy="420" r="9" fill="#eef3f0"/>
+      <g font-family="PJS" font-weight="700" fill="#eef3f0" font-size="17"><text x="118" y="632">Pine Gap car park</text><text x="490" y="238">Ridge top · 812 m</text><text x="236" y="412">Halfway hut</text></g>
+      <g font-family="PJS" font-weight="600" fill="#6f857c" font-size="14"><text x="600" y="664">500 m</text></g><path d="M560 670h90" stroke="#6f857c" stroke-width="2"/>
+    </svg>
+  </div>
+  <div class="stats">
+    <div class="card stat"><small>Distance</small><strong>12.4 <i>km</i></strong></div>
+    <div class="card stat"><small>Climb</small><strong>640 <i>m</i></strong></div>
+    <div class="card stat"><small>Walking time</small><strong>4 <i>h</i> 30</strong></div>
+  </div>
+  <div style="margin-top:18px;display:flex;justify-content:space-between;align-items:center"><span class="chip ok">Map saved for offline use</span><span class="btn">Plan this walk</span></div>
+  <div class="nav"><span>Routes</span><span class="on">Map</span><span>Plan</span><span>Log</span></div>
+</section>
+
+<section class="screen" id="s3">
+  <div class="bar"><b>Trailhead</b><span>Ridge Loop</span></div>
+  <div class="eyebrow">Saturday 14 November · 07:30</div>
+  <h1>Trip plan</h1>
+  <p class="lede">Four walkers. Everything ticked before you leave the car park.</p>
+  <div class="cols">
+    <div class="card box"><h2>Who is coming <span class="chip ok">4</span></h2>
+      <div class="who"><i>LM</i>Lena M.<span>leader</span></div><div class="who"><i>TK</i>Tom K.<span>first aid</span></div>
+      <div class="who"><i>RA</i>Rana A.</div><div class="who"><i>JP</i>Jon P.</div></div>
+    <div class="card box"><h2>Kit list <span class="chip">5 of 7</span></h2>
+      <div class="check done"><i>✓</i>Water, 2 litres each</div><div class="check done"><i>✓</i>First aid kit</div>
+      <div class="check done"><i>✓</i>Head torches</div><div class="check done"><i>✓</i>Offline map saved</div>
+      <div class="check done"><i>✓</i>Whistle</div><div class="check"><i></i>Spare warm layer</div><div class="check"><i></i>Lunch</div></div>
+  </div>
+  <div class="card meet"><div><h2>Meeting point</h2><p>Pine Gap car park, by the notice board</p></div><span class="chip">07:30</span></div>
+  <div class="card meet"><div><h2>Turn-back time</h2><p>If the ridge top is not reached by 11:00, the group turns back.</p></div><span class="chip">11:00</span></div>
+  <div style="margin-top:22px;text-align:right"><span class="btn">Start the walk</span></div>
+  <div class="nav"><span>Routes</span><span>Map</span><span class="on">Plan</span><span>Log</span></div>
+</section>
+
+<section class="screen" id="s4">
+  <div class="bar"><b>Trailhead</b><span>Ridge Loop · Sat 14 Nov</span></div>
+  <div class="eyebrow">Finished · all four back</div>
+  <h1>Trip log</h1>
+  <p class="lede">What the walk really was, kept for next time.</p>
+  <div class="stats" style="margin-top:26px">
+    <div class="card stat"><small>Distance walked</small><strong>12.9 <i>km</i></strong></div>
+    <div class="card stat"><small>Time out</small><strong>4 <i>h</i> 52</strong></div>
+    <div class="card stat"><small>Ridge top at</small><strong>10:41</strong></div>
+  </div>
+  <div class="card profile"><h2>Height along the way</h2>
+    <svg viewBox="0 0 668 250" fill="none"><g stroke="#1f352e"><path d="M0 60h668M0 125h668M0 190h668"/></g>
+      <path d="M0 220c60-10 90-60 150-90s80-70 150-100 70 10 110 50 60 70 120 90 90 40 138 50V250H0z" fill="rgba(242,163,58,.16)"/>
+      <path d="M0 220c60-10 90-60 150-90s80-70 150-100 70 10 110 50 60 70 120 90 90 40 138 50" stroke="#f2a33a" stroke-width="4"/>
+      <circle cx="300" cy="30" r="7" fill="#f2a33a"/><g font-family="PJS" font-size="14" font-weight="600" fill="#9fb1a9"><text x="314" y="26">812 m</text><text x="0" y="246">0 km</text><text x="622" y="246">12.9</text></g></svg></div>
+  <div class="card notes"><h2>Notes for next time</h2>
+    <p><b>The stream crossing was high.</b> Allow 20 minutes more after rain.</p>
+    <p><b>The halfway hut is a good lunch stop.</b> Sheltered, with a bench.</p></div>
+  <div style="margin-top:20px;display:flex;justify-content:space-between;align-items:center"><span class="chip ok">Saved on this tablet</span><span class="btn">Share the log</span></div>
+  <div class="nav"><span>Routes</span><span>Map</span><span>Plan</span><span class="on">Log</span></div>
+</section>
+
+<script>document.getElementById("s" + ((location.hash || "#1").slice(1))).classList.add("on");</script>
+</body>
+</html>

@@ -1,0 +1,182 @@
+/* introflow: the look. Fixed: the page shape, the type and the parts. The colours arrive as variables from
+   theme.js (the app's own two colours, on the app's paper or on white). Sizes are in px: one page is
+   1122 x 792, A4 lying on its side. */
+@font-face { font-family: "Alexandria"; src: url("fonts/Alexandria-Regular.ttf"); font-weight: 400; }
+@font-face { font-family: "Alexandria"; src: url("fonts/Alexandria-SemiBold.ttf"); font-weight: 600; }
+@font-face { font-family: "Alexandria"; src: url("fonts/Alexandria-Bold.ttf"); font-weight: 700; }
+@font-face { font-family: "Alexandria"; src: url("fonts/Alexandria-ExtraBold.ttf"); font-weight: 800; }
+@font-face { font-family: "Plex Mono"; src: url("fonts/IBMPlexMono-Regular.ttf"); font-weight: 400; }
+
+@page { size: 1122px 792px; margin: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { font-family: "Alexandria", sans-serif; background: #d9dde4; color: #14161f; }
+
+/* ---------- on screen only: the hint bar and the room around the pages ---------- */
+.hint { position: sticky; top: 0; z-index: 5; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; padding: 10px 18px; background: #fff; border-bottom: 1px solid #cdd3dc; font-size: 13px; color: #3a4257; }
+.hint span { margin-inline-end: auto; }
+.hint a { color: #14161f; font-weight: 600; text-decoration: none; border: 1px solid #c2c9d6; border-radius: 8px; padding: 6px 12px; }
+.hint a[aria-current="true"] { background: #14161f; color: #fff; border-color: #14161f; }
+.hint a:focus-visible { outline: 3px solid #3d5afe; outline-offset: 2px; }
+.sheets { display: flex; flex-direction: column; align-items: center; gap: 22px; padding: 22px; }
+@media screen { .sheets { zoom: var(--zoom, 1); } }
+@media print {
+  body { background: none; }
+  .hint { display: none; }
+  .sheets { display: block; padding: 0; }
+}
+
+/* ---------- a page ---------- */
+.page { position: relative; width: 1122px; height: 792px; overflow: hidden; flex: none; padding: 52px 64px; background: var(--bg); color: var(--ink); break-after: page; --r: 1; }
+.page:last-child { break-after: auto; }
+[dir="rtl"] .page { --r: -1; }
+/* Everything that may run off the page's edge lives in here, so it never counts as text that does not fit. */
+.deco { position: absolute; inset: 0; overflow: hidden; }
+.deco::before { content: ""; position: absolute; inset: 0; background: radial-gradient(900px 620px at 72% 46%, var(--glow) 0%, transparent 70%); }
+[dir="rtl"] .deco::before { background: radial-gradient(900px 620px at 28% 46%, var(--glow) 0%, transparent 70%); }
+.page > :not(.deco) { position: relative; }
+.nm { display: inline-block; direction: ltr; unicode-bidi: isolate; }
+.lab { font-family: "Plex Mono", "Alexandria", sans-serif; font-size: 12px; color: var(--label); }
+[lang="en"] .lab { text-transform: uppercase; letter-spacing: .1em; }
+.lab.quiet { color: var(--ink3); }
+/* Plex Mono has no Arabic letters: Arabic labels are set in Alexandria, so words keep their natural spacing */
+[lang="ar"] .lab { font-family: "Alexandria", sans-serif; font-size: 12.5px; }
+
+/* ---------- the project's background drawing ---------- */
+.motif { position: absolute; top: 16px; inset-inline-end: -48px; width: 760px; height: 760px; color: var(--motif); }
+.motif.soft { -webkit-mask-image: radial-gradient(circle, #000 34%, transparent 66%); mask-image: radial-gradient(circle, #000 34%, transparent 66%); }
+.paper-white .motif { opacity: .7; }
+
+/* ---------- a screen in its device ---------- */
+.dev { position: relative; padding: 9px; border-radius: 26px; background: #0c1222; border: 1.5px solid #3a4560; flex: none; }
+.dev .scr { display: block; width: 100%; border-radius: 16px; }
+.dev.kind-phone { padding: 7px; border-radius: 30px; }
+.dev.kind-phone .scr { border-radius: 23px; }
+.dev.kind-desktop, .dev.kind-website { padding: 0 0 0; border-radius: 12px; overflow: hidden; }
+.dev.kind-desktop .scr, .dev.kind-website .scr { border-radius: 0; }
+.dev .bar { display: flex; gap: 6px; align-items: center; height: 22px; padding: 0 10px; background: #1a2135; }
+.dev .bar i { width: 7px; height: 7px; border-radius: 50%; background: #5a6480; }
+.dev.kind-website .bar::after { content: ""; flex: 1; height: 10px; margin-inline-start: 8px; border-radius: 5px; background: #2a3350; }
+.scr.missing { display: grid; place-items: center; background: #1a2135; color: #8e9bb5; font-size: 11px; text-align: center; padding: 8px; aspect-ratio: 10 / 16; }
+.wide .scr.missing { aspect-ratio: 16 / 10; }
+.kind-phone .scr.missing { aspect-ratio: 9 / 19; }
+.wide .kind-phone .scr.missing { aspect-ratio: 19 / 9; }
+
+/* a readable cut of one screen */
+.cut { position: relative; overflow: hidden; border-radius: 11px; background: #0c1222; flex: none; width: 318px; height: 150px; }
+.cut img { position: absolute; top: 0; left: 0; width: 154%; max-width: none; }
+.wide .cut { width: 240px; height: 140px; }
+.wide .cut img { width: 210%; }
+.cut .scr.missing { position: absolute; inset: 0; aspect-ratio: auto; }
+
+/* ---------- the facts ---------- */
+.fact { display: flex; gap: 12px; align-items: center; border: 1px solid var(--line); background: var(--card); border-radius: 14px; padding: 11px 16px; padding-inline-start: 14px; }
+.fact svg { width: 22px; height: 22px; fill: none; stroke: var(--label); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; display: block; flex: none; }
+.fact small { display: block; font-size: 11.5px; color: var(--ink3); }
+.fact strong { font-size: 14px; font-weight: 600; }
+
+/* ---------- page 1 · the cover ---------- */
+.cover .txt { width: 372px; }
+.cover .who-for { margin-top: 6px; }
+.cover .name { font-weight: 800; line-height: 1.05; letter-spacing: -.035em; margin: 96px 0 24px; white-space: nowrap; }
+/* Arabic letters join, and sit lower: no tightening, more room under the name */
+[lang="ar"] .cover .name { letter-spacing: 0; line-height: 1.5; margin-bottom: 30px; }
+.cover .lead { font-size: 16.5px; line-height: 1.85; color: var(--ink2); }
+.cover .facts { position: absolute; bottom: 48px; inset-inline-start: 64px; display: flex; gap: 12px; }
+.fan { position: absolute; }
+.fan.f1 { top: 196px; inset-inline-end: 372px; width: 250px; transform: rotate(calc(var(--r) * -8deg)); }
+.fan.f3 { top: 196px; inset-inline-end: 2px; width: 250px; transform: rotate(calc(var(--r) * 8deg)); }
+.fan.f2 { top: 128px; inset-inline-end: 170px; width: 298px; }
+.paper-app .fan.f1, .paper-app .fan.f3 { filter: brightness(.8); }
+.fan.alone { top: 128px; inset-inline-end: 170px; }
+.kind-phone.fan.f1, .kind-phone.fan.f3 { width: 196px; top: 190px; }
+.kind-phone.fan.f1 { inset-inline-end: 352px; }
+.kind-phone.fan.f3 { inset-inline-end: 44px; }
+.kind-phone.fan.f2 { width: 236px; top: 120px; inset-inline-end: 178px; }
+.wide .cover .lead { font-size: 15.5px; }
+.wide .cover .facts { flex-direction: column; gap: 8px; bottom: 44px; }
+.wide .cover .fact { padding-block: 7px; }
+.wide .fan.f1 { top: 120px; inset-inline-end: 262px; width: 330px; transform: rotate(calc(var(--r) * -6deg)); }
+.wide .fan.f3 { top: 468px; inset-inline-end: 26px; width: 330px; transform: rotate(calc(var(--r) * 5deg)); }
+.wide .fan.f2, .wide .fan.alone { top: 262px; inset-inline-end: 84px; width: 456px; }
+
+/* ---------- the inside pages ---------- */
+.top { display: flex; justify-content: space-between; }
+h2 { font-size: 46px; font-weight: 800; letter-spacing: -.02em; line-height: 1.2; margin: 14px 0 0; }
+[lang="ar"] h2 { letter-spacing: 0; }
+.sub { font-size: 16px; color: var(--ink3); margin-top: 2px; }
+.page .foot { position: absolute; bottom: 20px; inset-inline: 64px; display: flex; justify-content: space-between; gap: 20px; font-size: 12px; color: var(--ink3); }
+.card { border: 1px solid var(--line); background: var(--card); border-radius: 18px; padding: 15px 22px 16px; }
+.card .lab { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.card h3 { font-size: 18px; font-weight: 700; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.card p { font-size: 15px; line-height: 1.7; color: var(--ink2); margin-top: 4px; }
+.guess { font-family: "Alexandria", sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--gold); border: 1px dashed var(--gold); border-radius: 999px; padding: 2px 10px; white-space: nowrap; flex: none; }
+
+/* page 2 · who it is for, and why */
+.who .cols { display: grid; grid-template-columns: 1fr auto; gap: 48px; margin-top: 24px; align-items: center; }
+.who .cards { display: grid; gap: 14px; }
+/* two or three cards have the room for larger words */
+.who .cards.n2 .card, .who .cards.n3 .card { padding: 20px 24px 22px; }
+.who .cards.n2 p, .who .cards.n3 p { font-size: 17px; line-height: 1.8; margin-top: 6px; }
+.who .dev { width: 286px; }
+.who .dev.kind-phone { width: 214px; }
+.wide .who .cols { gap: 40px; }
+.wide .who .dev { width: 470px; }
+
+/* page 3 · what it does */
+.what .cols { display: grid; grid-template-columns: 252px 1fr; gap: 48px; margin-top: 22px; }
+.what .main .dev { width: 252px; }
+.what .main .dev.kind-phone { width: 206px; }
+.what .main .lab { display: block; margin-top: 16px; }
+.what .main .lab:empty { margin-top: 10px; }
+.what h3 { font-size: 20px; font-weight: 700; margin-top: 4px; display: flex; align-items: center; gap: 10px; }
+.what h3 b { width: 26px; height: 26px; border-radius: 50%; background: var(--acc); color: var(--on-acc); display: grid; place-items: center; font-size: 13px; flex: none; }
+.what p.t { font-size: 14px; line-height: 1.75; color: var(--ink2); margin-top: 4px; }
+.what .rows { display: grid; gap: 22px; align-content: start; }
+.what .rowx { display: grid; grid-template-columns: auto 1fr; gap: 30px; align-items: center; border: 1px solid var(--line); background: var(--card); border-radius: 18px; padding: 9px; padding-inline-end: 22px; }
+.wide .what .cols { grid-template-columns: 470px 1fr; gap: 40px; }
+.wide .what .main .dev { width: 470px; }
+.wide .what .rowx { gap: 22px; }
+.wide .what .rowx h3 { font-size: 19px; margin-top: 0; }
+.wide .what .rowx p.t { font-size: 13.5px; line-height: 1.65; }
+
+/* page 4 · what makes it different */
+.different .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 18px; margin-top: 22px; }
+.different .card p { font-size: 14.5px; line-height: 1.65; }
+/* the closing row: every screen once more, small, and where to go next (beside upright screens, under wide ones) */
+.different .closing { display: flex; gap: 36px; margin-top: 24px; align-items: center; }
+.wide .different .closing { display: block; margin-top: 30px; }
+.wide .different .card { padding: 20px 24px 22px; }
+.wide .different .card h3 { font-size: 20px; }
+.wide .different .card p { font-size: 16px; }
+.different .strip { display: flex; gap: 26px; align-items: flex-start; }
+.different .strip figure { width: 170px; }
+.different .strip .dev { width: 170px; padding: 5px; border-radius: 15px; }
+.different .strip .dev .scr { border-radius: 10px; }
+.different .strip .dev.kind-phone { width: 108px; border-radius: 17px; }
+body.kind-phone .different .strip figure { width: 108px; }
+/* one or two cards leave room: larger words and larger screens fill the page */
+.different .few .card { padding: 22px 26px 24px; }
+.different .few .card h3 { font-size: 21px; }
+.different .few .card p { font-size: 17px; line-height: 1.8; }
+.different .few .strip figure, .different .few .strip .dev { width: 210px; }
+body.kind-phone .different .few .strip figure, .different .few .strip .dev.kind-phone { width: 150px; }
+.wide .different .few .strip figure, .wide .different .few .strip .dev { width: 228px; }
+.different .few .strip figcaption { font-size: 14px; }
+.different .strip .dev.kind-phone .scr { border-radius: 12px; }
+.different .strip .dev.kind-desktop, .different .strip .dev.kind-website { padding: 0; border-radius: 8px; }
+.different .strip .dev.kind-desktop .scr, .different .strip .dev.kind-website .scr { border-radius: 0; }
+.different .strip .dev .bar { height: 12px; gap: 3px; padding: 0 6px; }
+.different .strip .dev .bar i { width: 4px; height: 4px; }
+.different .strip figcaption { font-size: 12.5px; font-weight: 600; margin-top: 8px; color: var(--ink2); }
+.wide .different .strip figure, .wide .different .strip .dev { width: 228px; }
+.different .next { flex: 1; display: grid; gap: 8px; border: 1px solid var(--line); background: var(--card); border-radius: 18px; padding: 18px 20px; font-size: 16px; line-height: 1.7; color: var(--ink2); }
+.different .next b { color: var(--label); font-size: 24px; line-height: 1; font-weight: 400; }
+.wide .different .next { display: flex; gap: 12px; align-items: center; margin-top: 18px; padding: 12px 18px; }
+
+/* ---------- when the text copy cannot be drawn ---------- */
+.problems { max-width: 820px; margin: 40px auto; background: #fff; border: 2px solid #d92d20; border-radius: 16px; padding: 26px 30px; color: #14161f; }
+.problems h1 { font-size: 22px; color: #b42318; }
+.problems p { margin-top: 8px; color: #3a4257; }
+.problems ol { margin: 16px 0 0 22px; display: grid; gap: 8px; line-height: 1.6; }
+noscript { display: block; max-width: 720px; margin: 40px auto; padding: 20px; background: #fff; border-radius: 12px; }

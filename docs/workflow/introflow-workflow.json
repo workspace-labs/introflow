@@ -1,0 +1,249 @@
+{
+  "project": {
+    "name": "introflow Skill",
+    "accent": "introflow",
+    "client": "Everyone (public skill)",
+    "summary": "introflow makes a short project introduction for people outside the project: a client, a judge or a friend who asks what the project is. The AI reads the project and writes the words; the owner corrects them; then it draws a PDF in the app's own colours, on white paper for printing, or both.",
+    "actors": [
+      {
+        "name": "Owner",
+        "role": "Asks for the intro, corrects the words and sends the PDF."
+      },
+      {
+        "name": "AI",
+        "role": "Reads the project, drafts the words, fills the fixed template and prints."
+      },
+      {
+        "name": "Reader",
+        "role": "The client, judge or friend who reads the intro."
+      }
+    ],
+    "assumptions": [
+      "The AI only reads the project. It never changes the project's files.",
+      "Words it worked out itself (why it was built, what makes it different) stay marked until the owner confirms them.",
+      "A fact the project's files do not hold is asked, never invented.",
+      "Both papers carry the same words and the same pages.",
+      "English or Arabic, asked each time. A browser is the only need."
+    ],
+    "open_questions": [
+      "How does the skill pick the project's background drawing when the app has no clear motif?"
+    ]
+  },
+  "parts": [
+    {
+      "title": "Read the project",
+      "summary": "Three short questions, then the AI reads what the project already says about itself.",
+      "lanes": [
+        "Owner",
+        "AI"
+      ],
+      "nodes": [
+        {
+          "id": "start",
+          "type": "start",
+          "lane": "Owner",
+          "title": "Wants a project intro"
+        },
+        {
+          "id": "ask",
+          "type": "step",
+          "lane": "AI",
+          "title": "Asks three questions",
+          "detail": "reader, language, paper",
+          "result": "Reader, language and paper"
+        },
+        {
+          "id": "read",
+          "type": "step",
+          "lane": "AI",
+          "title": "Reads the project",
+          "detail": "README, scope, app flow",
+          "result": "The facts on file"
+        },
+        {
+          "id": "shots",
+          "type": "decision",
+          "lane": "AI",
+          "title": "Has real screens?",
+          "branches": [
+            {
+              "label": "Yes",
+              "to": "pick"
+            },
+            {
+              "label": "No",
+              "to": "drop"
+            }
+          ]
+        },
+        {
+          "id": "drop",
+          "type": "step",
+          "lane": "Owner",
+          "title": "Gives screenshots",
+          "detail": "demo data only",
+          "result": "A screenshot folder",
+          "next": "pick"
+        },
+        {
+          "id": "pick",
+          "type": "step",
+          "lane": "AI",
+          "title": "Picks colours and screens",
+          "detail": "the app's own",
+          "result": "The app's look"
+        },
+        {
+          "id": "done",
+          "type": "end",
+          "lane": "AI",
+          "title": "Knows the project",
+          "to_part": 2
+        }
+      ]
+    },
+    {
+      "title": "Write the words",
+      "summary": "The AI drafts every word first; the owner only confirms or corrects.",
+      "lanes": [
+        "AI",
+        "Owner"
+      ],
+      "nodes": [
+        {
+          "id": "start",
+          "type": "start",
+          "lane": "AI",
+          "title": "Knows the project"
+        },
+        {
+          "id": "draft",
+          "type": "step",
+          "lane": "AI",
+          "title": "Drafts all the words",
+          "detail": "guesses are marked",
+          "result": "A words draft"
+        },
+        {
+          "id": "show",
+          "type": "step",
+          "lane": "AI",
+          "title": "Shows the draft",
+          "detail": "missing facts are named",
+          "result": "A draft to check"
+        },
+        {
+          "id": "right",
+          "type": "decision",
+          "lane": "Owner",
+          "title": "Right?",
+          "branches": [
+            {
+              "label": "Yes",
+              "to": "done"
+            },
+            {
+              "label": "Changes",
+              "to": "fix"
+            }
+          ]
+        },
+        {
+          "id": "fix",
+          "type": "step",
+          "lane": "AI",
+          "title": "Rewrites those lines",
+          "detail": "keeps the owner's meaning",
+          "result": "A new draft",
+          "next": "show"
+        },
+        {
+          "id": "done",
+          "type": "end",
+          "lane": "Owner",
+          "title": "Words approved",
+          "to_part": 3
+        }
+      ]
+    },
+    {
+      "title": "Draw and hand over",
+      "summary": "The fixed template is filled, printed on the chosen paper and checked page by page.",
+      "lanes": [
+        "AI",
+        "Owner",
+        "Reader"
+      ],
+      "nodes": [
+        {
+          "id": "start",
+          "type": "start",
+          "lane": "AI",
+          "title": "Words approved"
+        },
+        {
+          "id": "fill",
+          "type": "step",
+          "lane": "AI",
+          "title": "Fills the template",
+          "detail": "text copy and page",
+          "result": "The intro page"
+        },
+        {
+          "id": "one",
+          "type": "step",
+          "lane": "AI",
+          "title": "Prints the PDFs",
+          "detail": "app colour, white or both",
+          "result": "One or two PDFs"
+        },
+        {
+          "id": "check",
+          "type": "step",
+          "lane": "AI",
+          "title": "Checks every page",
+          "detail": "as pictures",
+          "result": "Checked pages"
+        },
+        {
+          "id": "ok",
+          "type": "decision",
+          "lane": "Owner",
+          "title": "Agrees?",
+          "branches": [
+            {
+              "label": "Yes",
+              "to": "send"
+            },
+            {
+              "label": "Changes",
+              "to": "upd"
+            }
+          ]
+        },
+        {
+          "id": "upd",
+          "type": "step",
+          "lane": "AI",
+          "title": "Updates and reprints",
+          "detail": "next version number",
+          "result": "A new version",
+          "next": "check"
+        },
+        {
+          "id": "send",
+          "type": "step",
+          "lane": "Owner",
+          "title": "Sends it",
+          "result": "The intro, delivered"
+        },
+        {
+          "id": "done",
+          "type": "end",
+          "lane": "Reader",
+          "title": "Knows the project"
+        }
+      ]
+    }
+  ]
+}
