@@ -22,7 +22,7 @@ are skipped and say so; nothing is installed.
 
 The tests check the reading rules, the colour rules, and whether a page is drawn or refused. They cannot see
 whether a page looks right. After any change to the
-template, draw both examples and a real project on **both papers** and look at every page: copy
+template, draw the examples (the full one and a simple one) and a real project on **both papers** and look at every page: copy
 `skills/introflow/assets/template/` to a scratch folder, paste a text copy between the two `intro` lines of
 `intro.html`, then print with the commands in `skills/introflow/references/pdf.md`.
 
@@ -30,9 +30,9 @@ template, draw both examples and a real project on **both papers** and look at e
 
 - Keep `skills/introflow/` clean: it is installed and uploaded as it is. No test files, no drawn PDFs.
 - The look lives in `skills/introflow/assets/template/introflow/introflow.css` and the colour rules in
-  `theme.js`. They are the owner's decisions (ADR 0003, and ADR 0004 for the cover's name): never change fonts, the page
+  `theme.js`. They are the owner's decisions (ADR 0003, ADR 0004 for the cover's name, ADR 0005 for the length): never change fonts, the page
   shape, how colours are worked out or how the name is sized without his yes.
-- `model.js`, `theme.js` and `strings.js` never touch the page (no `document`); only `render.js` does. That
+- `model.js`, `theme.js`, `strings.js` and `art.js` never touch the page (no `document`); only `render.js` does. That
   keeps them testable in Node.
 - After the first release, every change bumps `VERSION` in
   `skills/introflow/assets/template/introflow/model.js` and adds a dated `CHANGELOG.md` entry. Until 0.1.0 is

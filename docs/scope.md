@@ -2,10 +2,12 @@
 
 ## What it does
 
-- Makes a **four-page project introduction** for people outside the project: the cover, who it is for and
-  why, what it does, what makes it different.
-- **The agent reads the project and drafts every word.** The owner answers three questions (reader,
-  language, paper), then confirms or corrects the draft.
+- Makes a **project description** for people outside the project: every window and every feature, as many
+  pages as the project needs. The project decides what there is; the owner decides what to make from it
+  (the full description, a simple four-page introduction, or a deeper book). The skill sets no number (ADR 0005).
+- **The agent reads the project, lists everything it found, and drafts every word.** The owner answers four
+  questions (how much, reader, language, paper), confirms the list is complete, then confirms or corrects
+  the draft.
 - Shows the **app's real screens**, in a frame that follows the kind of project (phone, tablet, desktop
   window, browser), upright or wide.
 - **Follows the app**: the pages take the app's own background and main button colour.
@@ -15,6 +17,7 @@
 
 ## What it will NOT do
 
+- No choosing for the owner what to leave out, and no page limit of its own.
 - No invented facts. What the project's files do not say is asked; what the agent worked out is marked as a
   guess until the owner confirms it.
 - No changes to the project it reads: it writes only inside `docs/intro/`.

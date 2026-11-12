@@ -8,7 +8,8 @@ const { parse, VERSION, LIMITS } = require("../skills/introflow/assets/template/
 const strings = require("../skills/introflow/assets/template/introflow/strings.js");
 
 const EXAMPLES = path.join(__dirname, "../skills/introflow/examples");
-const GOOD = fs.readFileSync(path.join(EXAMPLES, "trailhead-tablet.md"), "utf8");
+const GOOD = fs.readFileSync(path.join(EXAMPLES, "trailhead-simple.md"), "utf8");   // a simple, four-page introduction
+const FULL = fs.readFileSync(path.join(EXAMPLES, "trailhead-tablet.md"), "utf8");   // a full description, with parts
 
 // The good example with one line swapped (the line is found by its start) or lines added at the end.
 function change(start, replacement) {
@@ -32,7 +33,7 @@ test("the version is a real version number", () => {
 
 test("every example in the skill reads with no problems", () => {
   const files = fs.readdirSync(EXAMPLES).filter((f) => f.endsWith(".md"));
-  assert.ok(files.length >= 2);
+  assert.ok(files.length >= 3);
   for (const file of files) {
     const result = parse(fs.readFileSync(path.join(EXAMPLES, file), "utf8"));
     assert.deepEqual(result.problems, [], file);
@@ -105,8 +106,9 @@ test("missing and broken settings are refused by line", () => {
 test("sections: all four are needed, once, with the right number of lines", () => {
   refusedWith(parse(GOOD.split("## different")[0]), "## different is missing");
   refusedWith(parse(GOOD + "\n## facts\n- Device: Tablet\n"), "written twice");
+  assert.equal(parse(GOOD).intro.features.length, 0, "## features may be left out");
   refusedWith(parse(GOOD.replace("## who", "## users")), "is not a section");
-  refusedWith(parse(GOOD + "- One: more line.\n- And: another line.\n"), "2 to 4 lines; it has 6");
+  refusedWith(parse(GOOD + "- One: more line.\n- And: another line.\n"), "2 to 4 lines in a simple introduction; it has 6");
   refusedWith(change("- For [people]", "- For [people]: Walking clubs\n- Price: Free").result, "1 to 3 lines; it has 4");
 });
 
@@ -123,7 +125,7 @@ test("screens: numbering, pictures and cuts", () => {
   c = change("   shot: screenshots/3-plan.png", "   shot: screenshots/2-stock.gif"); refusedWith(c.result, ".png, .jpg", c.line);
   c = change("   cut: 0%, 18%", "   cut: 140%, 28%"); refusedWith(c.result, "two numbers from 0 to 100", c.line);
   c = change("   cut: 0%, 18%", "   cut: left"); refusedWith(c.result, "two numbers from 0 to 100", c.line);
-  refusedWith(change("   shot: screenshots/3-plan.png", null).result, "cut: needs the screen's picture");
+  refusedWith(change("   shot: screenshots/3-plan.png", null).result, "cut: needs the window's picture");
   c = change("- main:", "- main: 9"); refusedWith(c.result, "from 1 to 4", c.line);
   c = change("- order:", "- order: random"); refusedWith(c.result, "order: is steps", c.line);
   c = change("2. Trip plan", "2. Trip plan: " + "y".repeat(LIMITS.stepCaption + 1)); refusedWith(c.result, "caption is too long", c.line);
@@ -150,4 +152,94 @@ test("dates are written by hand, the same on any computer; both languages have e
   assert.equal(strings.day("2026-11-12", "ar"), "12 نوفمبر 2026");
   assert.equal(strings.day("soon", "en"), "");
   assert.deepEqual(Object.keys(strings.WORDS.ar).sort(), Object.keys(strings.WORDS.en).sort());
+});
+
+// ---------- the full description: the project and its owner decide the length ----------
+
+test("the default is a full description, and it has no upper limit on windows or features", () => {
+  assert.equal(parse(FULL).intro.depth, "full");
+  assert.equal(parse(GOOD).intro.depth, "simple");
+  const lines = ["# Big Suite", "- kind: desktop", "- about: A made-up suite.", "## facts", "- Device: Desktop", "## who", "- For whom: A company.", "## what"];
+  for (let i = 1; i <= 250; i++) lines.push(`${i}. Window ${i}: What it is for.`);
+  lines.push("## features");
+  for (let i = 1; i <= 120; i++) lines.push(`- Feature ${i}: What it does.`);
+  lines.push("## different", "- One thing: It is long.");
+  const result = parse(lines.join("\n"));
+  assert.deepEqual(result.problems, []);
+  assert.equal(result.intro.what.steps.length, 250);
+  assert.equal(result.intro.features.length, 120);
+});
+
+test("a full description may also be very small: one window, one line in each section", () => {
+  const result = parse("# Tiny\n- kind: phone\n- about: One screen.\n## facts\n- Device: Phone\n## who\n- For whom: Me.\n## what\n1. Home: The only window.\n## different\n- Small: One window.\n");
+  assert.deepEqual(result.problems, []);
+});
+
+test("parts group the windows, and each window knows its part", () => {
+  const { intro, problems } = parse(FULL);
+  assert.deepEqual(problems, []);
+  assert.deepEqual(intro.what.parts.map((p) => p.title), ["Before the walk", "On the trail"]);
+  assert.equal(intro.what.parts[0].line, "Choosing where to go, and getting everyone ready");
+  assert.deepEqual(intro.what.steps.map((s) => s.part), [0, 0, 1, 1]);
+  assert.deepEqual(parse(GOOD).intro.what.parts, []);
+});
+
+test("a window carries longer text, what the user sees and does, and its own features", () => {
+  const plan = parse(FULL).intro.what.steps[1];
+  assert.equal(plan.name, "Trip plan");
+  assert.equal(plan.more.length, 1);
+  assert.deepEqual(plan.sees, ["Who is coming, and who leads", "The kit list, with what is still missing"]);
+  assert.equal(plan.does.length, 2);
+  assert.deepEqual(plan.feature.map((f) => f.label), ["Turn-back time", "Shared kit list"]);
+});
+
+test("parts and window lines that do not fit the shape are refused by line", () => {
+  refusedWith(parse(FULL.replace("### On the trail: Finding the way, and remembering it\n", "### On the trail\n### Empty part\n")), "has no windows under it");
+  refusedWith(parse(FULL.replace("### Before the walk: Choosing where to go, and getting everyone ready\n", "")), "every window sits under a part");
+  refusedWith(parse(FULL.replace("## features", "### Lost part\n## features")), "has no windows under it");
+  refusedWith(parse(FULL.replace("## different", "## different\n### A part here")), "belongs inside ## what");
+  refusedWith(parse(FULL.replace("   feature: Turn-back time: The hour", "   feature: Turn-back time, the hour")), "A feature looks like");
+  refusedWith(parse(FULL.replace("- order: steps", "   more: Too early.\n- order: steps")), "must sit under a numbered window");
+  refusedWith(parse(FULL.replace("   does: Starts the walk", "   does: " + "z".repeat(LIMITS.point + 1))), "too long");
+  const seven = "   sees: One more thing\n".repeat(7);
+  refusedWith(parse(FULL.replace("   does: Opens a route to see its map\n", seven)), "at most 6 sees: lines");
+  // review F09: the advice keeps the content; it never tells the agent to leave something out
+  const over = parse(FULL.replace("   does: Opens a route to see its map\n", seven)).problems.find((p) => p.text.includes("at most 6 sees"));
+  assert.match(over.text, /nothing needs to be left out/);
+  assert.doesNotMatch(over.text, /leave one out/);
+});
+
+test("a simple introduction is four pages: more than four windows, parts, features and longer text are refused, with the way out", () => {
+  const simple = FULL.replace("- kind: tablet", "- kind: tablet\n- depth: simple");
+  const result = parse(simple);
+  refusedWith(result, "A simple introduction has no parts");
+  refusedWith(result, "shows only a window's name and caption");
+  refusedWith(result, "has no features page");
+  const five = GOOD.replace("\n## different", "5. Extra: A fifth window.\n\n## different");
+  refusedWith(parse(five), "use - depth: full");
+  assert.equal(parse(five.replace("- depth: simple\n", "")).ok, true, "the same file is fine as a full description");
+  refusedWith(parse(GOOD.replace("- depth: simple", "- depth: huge")), "is not a depth");
+  assert.equal(parse(FULL.replace("- kind: tablet", "- kind: tablet\n- depth: book")).intro.depth, "book");
+});
+
+test("a guess among the features also blocks approval", () => {
+  const approved = FULL.replace("- status: draft", "- status: approved\n- approved: 2026-11-14");
+  assert.equal(parse(approved).problems.filter((p) => p.text.includes("still a guess")).length, 4);
+});
+
+test("an introduction and a conclusion are paragraphs; both may be left out; a guess in them blocks approval", () => {
+  const { intro, problems } = parse(FULL);
+  assert.deepEqual(problems, []);
+  assert.equal(intro.introduction.length, 3);
+  assert.equal(intro.conclusion.length, 3);
+  assert.deepEqual(intro.conclusion.map((p) => p.guess), [false, true, false]);
+  const without = FULL.slice(0, FULL.indexOf("## conclusion")).replace(/## introduction[\s\S]*?## who/, "## who");
+  assert.deepEqual(parse(without).problems, []);
+  assert.deepEqual(parse(without).intro.introduction, []);
+  refusedWith(parse(FULL.replace("## conclusion\n", "## conclusion\nA line with no dash.\n")), "A paragraph here is one line starting with -");
+  refusedWith(parse(FULL.replace("- Trailhead does a small job well", "- " + "w".repeat(LIMITS.paragraph + 1))), "The paragraph is too long");
+  refusedWith(parse(FULL + "- one\n".repeat(10)), "## conclusion holds 1 to 12 lines; it has 13");
+  const simple = parse(FULL.replace("- kind: tablet", "- kind: tablet\n- depth: simple"));
+  refusedWith(simple, "has no introduction page");
+  refusedWith(simple, "has no conclusion page");
 });

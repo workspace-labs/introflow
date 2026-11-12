@@ -12,7 +12,8 @@ const ROOT = path.join(__dirname, "../..");
 const TEMPLATE = path.join(ROOT, "skills/introflow/assets/template");
 const EXAMPLES = path.join(ROOT, "skills/introflow/examples");
 const DEMO_SHOTS = path.join(ROOT, "docs/decisions/hero-options/demo-app/screenshots");
-const TRAILHEAD = fs.readFileSync(path.join(EXAMPLES, "trailhead-tablet.md"), "utf8");
+const TRAILHEAD = fs.readFileSync(path.join(EXAMPLES, "trailhead-simple.md"), "utf8");   // the simple, four-page introduction
+const FULL = fs.readFileSync(path.join(EXAMPLES, "trailhead-tablet.md"), "utf8");        // the full description
 const CLINIC = fs.readFileSync(path.join(EXAMPLES, "clinic-booking-phone-ar.md"), "utf8");
 
 const BROWSER = [
@@ -35,7 +36,9 @@ const PROBE = `<script>(function wait(){var d=document.documentElement;if(!d.get
 var fans=Array.prototype.map.call(document.querySelectorAll(".cover .fan"),function(f){var b=f.querySelector(".scr.missing"),r=f.getBoundingClientRect(),m=b&&b.getBoundingClientRect(),c=b&&getComputedStyle(b);
 return{cls:f.className,filter:getComputedStyle(f).filter,dev:[r.left,r.top,r.right,r.bottom],box:m&&[m.left,m.top,m.right,m.bottom],font:c&&c.fontSize,text:b&&b.textContent};});
 var w=document.querySelector(".cover .name .nm"),n=w&&w.getBoundingClientRect(),p=document.querySelector(".cover"),g=p&&p.getBoundingClientRect();
-d.setAttribute("data-probe",JSON.stringify({fans:fans,name:n&&{box:[n.left,n.top,n.right,n.bottom],font:getComputedStyle(w).fontSize},page:g&&[g.left,g.top,g.right,g.bottom]}));})();</script>`;
+function px(sel,prop){var el=document.querySelector(sel);return el?getComputedStyle(el)[prop]:"";}
+var diff={p:px(".page.different .card p","fontSize"),h3:px(".page.different .card h3","fontSize"),dev:px(".page.different .strip .dev","width")};
+d.setAttribute("data-probe",JSON.stringify({fans:fans,name:n&&{box:[n.left,n.top,n.right,n.bottom],font:getComputedStyle(w).fontSize},page:g&&[g.left,g.top,g.right,g.bottom],different:diff}));})();</script>`;
 
 function run(args) {
   return spawnSync(BROWSER, ["--headless=new", "--disable-gpu", "--no-first-run", "--hide-scrollbars", "--virtual-time-budget=10000"].concat(args),
@@ -64,6 +67,13 @@ function draw(text, { paper = "", shots = false, probe = false, pixels = false }
       state: (/data-introflow="(\w+)"/.exec(dom) || [])[1] || "none",
       problems: [...dom.matchAll(/<li>([^<]*)<\/li>/g)].map((m) => m[1].replace(/&quot;/g, '"').replace(/&amp;/g, "&")),
       pages: (dom.match(/<section class="page /g) || []).length,
+      // each page's own markup, in order: for checks of what is on which page
+      sheets: dom.split('<section class="page ').slice(1),
+      // each page's kind and the words in its footer, in order
+      kinds: [...dom.matchAll(/<section class="page ([a-z]+)/g)].map((m) => m[1]),
+      feet: [...dom.matchAll(/<div class="foot"><span>[\s\S]*?<\/span><span>([^<]*)<\/span>/g)].map((m) => m[1]),
+      refs: [...dom.matchAll(/<b data-ref="(\w+)">(\d+)<\/b>/g)].map((m) => [m[1], Number(m[2])]),
+      ids: [...dom.matchAll(/<section class="page [^"]*"( data-id="(\w+)")?/g)].map((m) => m[2] || ""),
       // the size the page really gave the name, read from the drawn page (it is gone when the page is refused)
       nameSize: Number((/class="name" style="font-size:\s*([\d.]+)px/.exec(dom) || [])[1])
     };
@@ -125,4 +135,4 @@ function readPng(file) {
   return { width, height, at(x, y) { const i = y * stride + x * bpp; return [out[i], out[i + 1], out[i + 2]]; } };
 }
 
-module.exports = { BROWSER, skip, SCALE, TRAILHEAD, CLINIC, draw, line, readPng };
+module.exports = { BROWSER, skip, SCALE, TRAILHEAD, FULL, CLINIC, draw, line, readPng };

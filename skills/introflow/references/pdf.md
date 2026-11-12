@@ -51,7 +51,11 @@ Windows PowerShell:
 - The page address must be a full `file:///` path; on Windows use forward slashes after `file:///C:/`.
 - `--virtual-time-budget` gives the fonts and screenshots time to load before printing.
 - An older browser that does not know `--no-pdf-header-footer` uses `--print-to-pdf-no-header` instead.
-- Check the PDF exists, is not empty, and has **four pages**. The page sets A4 on its side by itself.
+- Check the PDF exists and is not empty, and that its page count is the one the page itself reports: every
+  footer says "Page n of m". A simple introduction has four pages; a full description has as many as the
+  project needs. The page sets A4 on its side by itself.
+- A long description with many pictures needs more time to load: raise `--virtual-time-budget` (for
+  example to 30000) if the PDF comes out with missing pictures.
 
 ## 3. One paper, or both
 
@@ -92,6 +96,6 @@ person to paste the list into the chat, then fix those lines.
 
 | The page shows | Meaning | What you do |
 |---|---|---|
-| The cover and three more pages | Every line was read and every word fits | Print |
+| The cover and the pages after it | Every line was read and every word fits | Print |
 | A red box with numbered problems | A line is wrong, or a page is too full | Fix `intro.md` by the lines it names, copy it in again, check again |
 | A grey box "Turn on JavaScript…" | The browser blocks scripts for files | Try another browser |
