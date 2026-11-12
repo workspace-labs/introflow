@@ -13,7 +13,7 @@ The skill is the folder [`skills/introflow/`](skills/introflow/): its instructio
 [`SKILL.md`](skills/introflow/SKILL.md), and a page template that draws the introduction in any browser.
 **Nothing to install.**
 
-**Version 0.1.0** · 19 automated tests · [how it was tested](TESTING.md)
+**Version 0.1.0** · 39 automated tests (14 of them open the real page in a browser) · [how it was tested](TESTING.md)
 
 ---
 

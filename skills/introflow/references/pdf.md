@@ -65,7 +65,8 @@ the other paper **from the same file**, add `?paper=white` or `?paper=app` to th
 
 - **App colour** is named `<Project> - Project intro.pdf`; **white paper** is named
   `<Project> - Project intro (print).pdf`, so the wrong one is never sent.
-- From version 2 on, add the version: `<Project> - Project intro v2.pdf`.
+- From version 2 on, add the version to both: `<Project> - Project intro v2.pdf` and
+  `<Project> - Project intro v2 (print).pdf`.
 - "Both" is these two commands. The words and pages are the same, because both read the same `intro.md`.
 - Look at **both** PDFs page by page. The white one is not a copy of the dark one: check it on its own.
 
@@ -77,7 +78,12 @@ When you cannot run a browser (no command line, no Chrome or Edge, or Claude in 
 > Open `intro.html` in Chrome, Edge or Safari. At the top, choose **App colour** or **White paper**. Press
 > Print, choose **Save as PDF**, then set **Paper A4**, **Landscape** (the page lies on its side),
 > **Margins None**, turn **Background graphics** on (in Safari: **Print backgrounds**) and **Headers and
-> footers** off. Save it as "<Project> - Project intro.pdf". For both papers, do it once for each.
+> footers** off. Save **App colour** as "<Project> - Project intro.pdf" and **White paper** as
+> "<Project> - Project intro (print).pdf". For both papers, do it once for each, with its own name.
+
+Give the person the exact names with the project's name already filled in, and from version 2 on with the
+version in both (`… - Project intro v2.pdf`, `… - Project intro v2 (print).pdf`), as in section 3. The two
+names must never be the same, or the second save replaces the first.
 
 If the page shows a red "introflow can't draw this introduction yet" box instead of the pages, ask the
 person to paste the list into the chat, then fix those lines.

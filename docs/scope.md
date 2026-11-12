@@ -26,7 +26,8 @@
 ## How good it must be
 
 - **Clean or refused.** A line that does not fit the shape, or a page too full to draw cleanly, shows a
-  numbered list of plain-language problems instead of a messy page.
+  numbered list of plain-language problems instead of a messy page. Words are never squeezed to fit, with
+  one exception the owner decided: the cover's name may be made a little smaller, never below 30 px (ADR 0004).
 - **Readable on both papers.** Labels in the app's accent are adjusted until they can be read (WCAG AA) on
   the app's colour and on white.
 - **Nothing to install.** A browser is the only need. The fonts travel inside the template.

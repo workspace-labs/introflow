@@ -44,37 +44,52 @@
     }).join("");
   }
 
-  // The accent, pushed towards `towards` only as far as it takes to be readable on `bg`.
-  function readable(accent, bg, towards) {
+  // A colour, pushed towards `towards` only as far as it takes to be readable on every one of `surfaces`.
+  function readable(colour, surfaces, towards) {
+    var list = [].concat(surfaces);
     for (var part = 1; part >= 0; part -= 0.05) {
-      var c = mix(accent, towards, part);
-      if (contrast(c, bg) >= LABEL_CONTRAST) return c;
+      var c = mix(colour, towards, part);
+      if (list.every(function (s) { return contrast(c, s) >= LABEL_CONTRAST; })) return c;
     }
     return towards;
   }
 
   /* stage and accent are hex (or empty for introflow's own); paper is "app" or "white".
-     White paper keeps the layout and spends no ink on the page itself: only the screens stay dark. */
+     White paper keeps the layout and spends no ink on the page itself: only the screens stay dark.
+     Words are printed on three surfaces: the page, a card, and the soft glow behind the screens. Every text
+     colour is readable (4.5:1) on all three, whatever the app's colours are. */
   function theme(stage, accent, paper) {
     var appBg = hex(stage) || DEFAULT.stage;
     var acc = hex(accent) || DEFAULT.accent;
     var white = paper === "white";
     var bg = white ? "#ffffff" : appBg;
-    var dark = luminance(bg) < 0.4;
-    // On light paper the ink carries a little of a dark app's own colour.
-    var ink = dark ? "#eef2f6" : (luminance(appBg) < 0.1 ? mix(appBg, "#1b1e26", 0.5) : "#14161f");
+    // The ink: light or dark, whichever reads better on this page. On light paper it carries a little of a
+    // dark app's own colour. A mid-tone page gets the strongest ink there is, pure white or pure black.
+    var lightInk = "#eef2f6", darkInk = luminance(appBg) < 0.1 ? mix(appBg, "#1b1e26", 0.5) : "#14161f";
+    var dark = contrast(lightInk, bg) >= contrast(darkInk, bg);
+    var ink = dark ? lightInk : darkInk;
+    if (contrast(ink, bg) < 7) {
+      dark = contrast("#ffffff", bg) >= contrast("#000000", bg);
+      ink = dark ? "#ffffff" : "#000000";
+    }
+    // A card and the glow are kept only where the ink still reads on them; otherwise they are the page itself.
+    var card = dark ? mix(acc, bg, 0.06) : "#ffffff";
+    if (contrast(ink, card) < LABEL_CONTRAST) card = bg;
+    var glow = dark ? mix(acc, bg, 0.24) : bg;
+    if (contrast(ink, glow) < LABEL_CONTRAST) glow = bg;
+    var surfaces = [bg, card, glow];
     return {
-      paper: white ? "white" : "app", dark: dark, bg: bg, ink: ink, acc: acc,
-      ink2: mix(ink, bg, 0.8),
-      ink3: mix(ink, bg, 0.58),
-      label: readable(acc, bg, dark ? "#ffffff" : ink),
-      // the number on an accent circle: whichever of dark and white reads better on that accent
-      onAcc: contrast("#0b0d10", acc) >= contrast("#ffffff", acc) ? "#0b0d10" : "#ffffff",
+      paper: white ? "white" : "app", dark: dark, bg: bg, ink: ink, acc: acc, surfaces: surfaces,
+      ink2: readable(mix(ink, bg, 0.8), surfaces, ink),
+      ink3: readable(mix(ink, bg, 0.58), surfaces, ink),
+      label: readable(acc, surfaces, ink),
+      // the number on an accent circle: pure black or pure white, whichever reads better (one always reaches 4.5:1)
+      onAcc: contrast("#000000", acc) >= contrast("#ffffff", acc) ? "#000000" : "#ffffff",
       line: dark ? mix(acc, bg, 0.22) : mix(ink, bg, 0.16),
-      card: dark ? mix(acc, bg, 0.06) : "#ffffff",
-      glow: dark ? mix(acc, bg, 0.24) : bg,
+      card: card,
+      glow: glow,
       motif: dark ? mix(acc, bg, 0.26) : mix(acc, bg, 0.3),
-      gold: dark ? "#f0c04a" : "#8a5a00"
+      gold: readable(dark ? "#f0c04a" : "#8a5a00", surfaces, ink)
     };
   }
 

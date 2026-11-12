@@ -123,5 +123,9 @@ Each refusal is a numbered sentence with its line:
 - screens numbered out of order, a picture path with a web link, `..`, a leading `/` or an odd character,
   a `cut:` with no `shot:`, a `main:` that names no screen;
 - `status: approved` with no `approved:` day, or with a `?` guess still in the file;
-- words longer than their place, and any page too full to draw cleanly (shorten the lines it names);
+- words longer than their limit, and any page too full to draw cleanly (shorten the lines it names);
+- a word wider than its place, running off the page or meeting a screen: a very long unbroken word such as
+  a web address, or facts too wide to sit side by side;
+- a name too wide for the cover even at its smallest size: a name that would reach the screens is first made
+  smaller, only until it is clear and never below 30 px; one still not clear at 30 px is refused;
 - a closing script tag or `<!--` anywhere in the text.

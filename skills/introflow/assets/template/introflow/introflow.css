@@ -57,7 +57,9 @@ body { font-family: "Alexandria", sans-serif; background: #d9dde4; color: #14161
 .dev .bar { display: flex; gap: 6px; align-items: center; height: 22px; padding: 0 10px; background: #1a2135; }
 .dev .bar i { width: 7px; height: 7px; border-radius: 50%; background: #5a6480; }
 .dev.kind-website .bar::after { content: ""; flex: 1; height: 10px; margin-inline-start: 8px; border-radius: 5px; background: #2a3350; }
-.scr.missing { display: grid; place-items: center; background: #1a2135; color: #8e9bb5; font-size: 11px; text-align: center; padding: 8px; aspect-ratio: 10 / 16; }
+/* The two outer screens of the cover are dimmed to 80% on the app's paper (.fan.f1, .fan.f3 below), and this
+   box is dimmed with them. Its words are light enough to stay readable after that: 6.4:1 dimmed, 9.3:1 plain. */
+.scr.missing { display: grid; place-items: center; background: #1a2135; color: #bcc6da; font-size: 11px; text-align: center; padding: 8px; aspect-ratio: 10 / 16; }
 .wide .scr.missing { aspect-ratio: 16 / 10; }
 .kind-phone .scr.missing { aspect-ratio: 9 / 19; }
 .wide .kind-phone .scr.missing { aspect-ratio: 19 / 9; }
@@ -153,14 +155,16 @@ h2 { font-size: 46px; font-weight: 800; letter-spacing: -.02em; line-height: 1.2
 .different .strip figure { width: 170px; }
 .different .strip .dev { width: 170px; padding: 5px; border-radius: 15px; }
 .different .strip .dev .scr { border-radius: 10px; }
-.different .strip .dev.kind-phone { width: 108px; border-radius: 17px; }
-body.kind-phone .different .strip figure { width: 108px; }
+.different .strip .dev.kind-phone { border-radius: 17px; }
+/* a phone held upright is narrow; held sideways it takes the wide sizes below */
+.upright .different .strip .dev.kind-phone { width: 108px; }
+body.upright.kind-phone .different .strip figure { width: 108px; }
 /* one or two cards leave room: larger words and larger screens fill the page */
 .different .few .card { padding: 22px 26px 24px; }
 .different .few .card h3 { font-size: 21px; }
 .different .few .card p { font-size: 17px; line-height: 1.8; }
 .different .few .strip figure, .different .few .strip .dev { width: 210px; }
-body.kind-phone .different .few .strip figure, .different .few .strip .dev.kind-phone { width: 150px; }
+body.upright.kind-phone .different .few .strip figure, .upright .different .few .strip .dev.kind-phone { width: 150px; }
 .wide .different .few .strip figure, .wide .different .few .strip .dev { width: 228px; }
 .different .few .strip figcaption { font-size: 14px; }
 .different .strip .dev.kind-phone .scr { border-radius: 12px; }

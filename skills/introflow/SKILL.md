@@ -114,7 +114,11 @@ Say these when they matter:
 
 - Four pages, always. Up to 3 facts, 2 to 4 lines on each inside page, 2 to 4 screens.
 - English and Arabic only.
-- A page that is too full is refused, not squeezed: shorten the lines it names.
+- A page that is too full is refused, not squeezed: shorten the lines it names. So is a word too wide for
+  its place, such as a long web address or three long facts: shorten it, or leave the address out.
+- The cover's name is the one thing the page may make smaller: a name too wide beside the screens is drawn
+  a little smaller, only until it is clear of them, and never below 30 px. A name still too wide at 30 px
+  is refused and the page says so. Tell the owner; the name is theirs to shorten or to write in small letters.
 - White paper saves the page's ink, not the screens': a dark app's screens stay dark.
 - Screens should all be one shape (all upright or all wide).
 

@@ -26,6 +26,9 @@
       notDrawn: "The page could not be drawn: ",
       fitCover: "The cover is too full: the name, the about line and the facts do not all fit. Shorten the about line.",
       fitPage: "The page \"{t}\" is too full. Shorten its longest lines.",
+      cover: "The cover",
+      fitName: "The name \"{t}\" is too wide for the cover: even at its smallest size (30 px) it would reach the screens. Use a shorter name, or write it in small letters after the first (\"Walkway\", not \"WALKWAY\").",
+      fitWide: "{t}: some words are wider than their place, run off the page or meet the screens. Shorten them, or put a space inside a very long word.",
       months: ["January", "February", "March", "April", "May", "June", "July", "August", "September",
         "October", "November", "December"]
     },
@@ -51,6 +54,9 @@
       notDrawn: "تعذّر رسم الصفحة: ",
       fitCover: "الغلاف ممتلئ: الاسم وسطر الوصف والحقائق لا تتسع معًا. اختصر سطر الوصف.",
       fitPage: "الصفحة «{t}» ممتلئة. اختصر أطول سطورها.",
+      cover: "الغلاف",
+      fitName: "الاسم «{t}» أعرض من مكانه في الغلاف: حتى بأصغر حجم له (30 بكسل) يصل إلى الشاشات. استخدم اسمًا أقصر، أو اكتب الاسم اللاتيني بأحرف صغيرة بعد الحرف الأول.",
+      fitWide: "{t}: بعض الكلمات أعرض من مكانها، أو تخرج من الصفحة، أو تلامس الشاشات. اختصرها، أو ضع مسافة داخل الكلمة الطويلة جدًا.",
       months: ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر",
         "أكتوبر", "نوفمبر", "ديسمبر"]
     }

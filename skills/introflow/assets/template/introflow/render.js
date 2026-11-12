@@ -166,16 +166,55 @@
     });
   }
 
-  // Words that do not fit are refused, never squeezed or cut off.
+  // Words that do not fit are refused, never squeezed, cut off or hidden. Three things are checked on every
+  // page: nothing runs below its place, nothing is wider than its own box, and nothing leaves the page.
+  // The cover also keeps its words clear of the screens. Art that is clipped on purpose (the drawing, the
+  // fanned screens, a picture's cut) lives in .deco or .cut and is never counted.
+  // One exception, by the owner's decision (ADR 0004): the cover's name, and only the name, may be made a
+  // little smaller, because a project cannot change its name to suit a page.
+  var EDGE = 24;            // the least room between any word and the page's edge, in px
+  var NAME_SMALLEST = 30;   // the cover's name is never drawn smaller than this, in px
+
+  function hits(a, b) { return a.left < b.right - 1 && a.right > b.left + 1 && a.top < b.bottom - 1 && a.bottom > b.top + 1; }
+
+  function runsWide(page) {
+    var box = page.getBoundingClientRect();
+    var parts = page.querySelectorAll(":scope > :not(.deco), :scope > :not(.deco) *:not(.cut):not(.cut *)");
+    return Array.prototype.some.call(parts, function (el) {
+      var r = el.getBoundingClientRect();
+      if (!r.width && !r.height) return false;
+      // The cover's name is one line by design and may be wider than the text under it: it is judged on its
+      // own, in tooFull. So the name is skipped here, and the box that holds it is not judged by its own width.
+      if (el.closest(".name")) return false;
+      if (r.left < box.left + EDGE || r.right > box.right - EDGE) return true;
+      if (el.querySelector(":scope > .name")) return false;
+      return el.clientWidth > 0 && el.scrollWidth > el.clientWidth + 1;
+    });
+  }
+
   function tooFull(w) {
     var full = [];
-    var cover = document.querySelector(".cover");
-    if (cover.querySelector(".txt").getBoundingClientRect().bottom > cover.querySelector(".facts").getBoundingClientRect().top - 10) full.push(w.fitCover);
+    var cover = document.querySelector(".cover"), box = cover.getBoundingClientRect();
+    var txt = cover.querySelector(".txt"), facts = cover.querySelector(".facts");
+    var screens = Array.prototype.map.call(cover.querySelectorAll(".fan"), function (s) { return s.getBoundingClientRect(); });
+    function meetsScreen(el) { var r = el.getBoundingClientRect(); return screens.some(function (s) { return hits(r, s); }); }
+    // The name starts at the size its length gives it (set where the cover is built). If at that size it
+    // would reach a screen or the page's edge, it is made smaller one pixel at a time, only until it is clear,
+    // and never below NAME_SMALLEST. A name that fits is not touched; one that is still not clear at the
+    // smallest size is refused (ADR 0004).
+    var name = cover.querySelector(".name"), word = name.querySelector(".nm"), size = parseFloat(name.style.fontSize);
+    function nameReaches() { var r = word.getBoundingClientRect(); return r.left < box.left + EDGE || r.right > box.right - EDGE || meetsScreen(word); }
+    while (nameReaches() && size - 1 >= NAME_SMALLEST) { size -= 1; name.style.fontSize = size + "px"; }
+    if (nameReaches()) full.push(S.fill(w.fitName, { t: word.textContent }));
+    if (txt.getBoundingClientRect().bottom > facts.getBoundingClientRect().top - 10) full.push(w.fitCover);
+    var meets = Array.prototype.some.call(cover.querySelectorAll(".txt .lab, .lead, .fact"), meetsScreen);
+    if (meets || runsWide(cover)) full.push(S.fill(w.fitWide, { t: w.cover }));
     [["who", w.who], ["what", w.what], ["different", w.different]].forEach(function (p) {
       var page = document.querySelector(".page." + p[0]);
       var flow = page.querySelector(".flow"), limit = page.querySelector(".foot").getBoundingClientRect().top - 8;
       var lowest = Math.max.apply(null, Array.prototype.map.call(flow.querySelectorAll("*:not(.cut *)"), function (el) { return el.getBoundingClientRect().bottom; }));
       if (lowest > limit) full.push(S.fill(w.fitPage, { t: p[1] }));
+      if (runsWide(page)) full.push(S.fill(w.fitWide, { t: p[1] }));
     });
     return full;
   }
